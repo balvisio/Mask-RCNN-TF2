@@ -2103,7 +2103,7 @@ class MaskRCNN():
         # Conditional import to support versions of Keras before 2.2
         # TODO: remove in about 6 months (end of 2018)
         try:
-            from keras.engine import saving
+            from tensorflow.python.keras.saving import hdf5_format
         except ImportError:
             # Keras before 2.2 used the 'topology' namespace.
             from keras.engine import topology as saving
@@ -2128,9 +2128,9 @@ class MaskRCNN():
             layers = filter(lambda l: l.name not in exclude, layers)
 
         if by_name:
-            saving.load_weights_from_hdf5_group_by_name(f, layers)
+            hdf5_format.load_weights_from_hdf5_group_by_name(f, layers)
         else:
-            saving.load_weights_from_hdf5_group(f, layers)
+            hdf5_format.load_weights_from_hdf5_group(f, layers)
         if hasattr(f, 'close'):
             f.close()
 
@@ -2277,7 +2277,7 @@ class MaskRCNN():
         # Directory for training logs
 #        self.log_dir = os.path.join(self.model_dir, "{}{:%Y%m%dT%H%M}".format(
 #            self.config.NAME.lower(), now))
-        self.log_dir = "//logdir//train"
+        self.log_dir = "./logdir//train"
 
         # Path to save after each epoch. Include placeholders that get filled by Keras.
         self.checkpoint_path = os.path.join(self.log_dir, "mask_rcnn_{}_*epoch*.h5".format(
