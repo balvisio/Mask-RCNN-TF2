@@ -1,5 +1,5 @@
 import os
-import xml.etree
+import xml.etree.ElementTree
 from numpy import zeros, asarray
 
 import mrcnn.utils
