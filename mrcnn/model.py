@@ -1788,7 +1788,7 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
             if b >= batch_size:
                 inputs = [batch_images, batch_image_meta, batch_rpn_match, batch_rpn_bbox,
                           batch_gt_class_ids, batch_gt_boxes, batch_gt_masks]
-                outputs = []
+                outputs = None
 
                 if random_rois:
                     inputs.extend([batch_rpn_rois])
@@ -1797,8 +1797,7 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
                         # Keras requires that output and targets have the same number of dimensions
                         batch_mrcnn_class_ids = np.expand_dims(
                             batch_mrcnn_class_ids, -1)
-                        outputs.extend(
-                            [batch_mrcnn_class_ids, batch_mrcnn_bbox, batch_mrcnn_mask])
+                        outputs = [batch_mrcnn_class_ids, batch_mrcnn_bbox, batch_mrcnn_mask]
 
                 yield inputs, outputs
 
