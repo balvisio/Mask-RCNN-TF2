@@ -72,6 +72,7 @@ class KangarooConfig(mrcnn.config.Config):
     
     NUM_CLASSES = 2
 
+    EPOCHS = 100
     STEPS_PER_EPOCH = 131
 
     # If using RPN_ROIS then RANDOM_ROIS should be 0. Otherwise,
@@ -106,7 +107,7 @@ model.load_weights(filepath='mask_rcnn_coco.h5',
 model.train(train_dataset=train_dataset, 
             val_dataset=validation_dataset, 
             learning_rate=kangaroo_config.LEARNING_RATE, 
-            epochs=1, 
+            epochs=kangaroo_config.EPOCHS, 
             layers='heads',
             random_rois=kangaroo_config.RANDOM_ROIS)
 
