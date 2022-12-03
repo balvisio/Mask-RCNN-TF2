@@ -1629,8 +1629,8 @@ def generate_random_rois(image_shape, count, gt_class_ids, gt_boxes):
     return rois
 
 
-def data_generator(dataset, config, shuffle=True, augment=False, augmentation=None,
-                   random_rois=0, batch_size=1, detection_targets=False,
+def data_generator(dataset, config, random_rois, shuffle=True, augment=False,
+                   augmentation=None, batch_size=1, detection_targets=False,
                    no_augmentation_sources=None):
     """A generator that returns images and corresponding target class ids,
     bounding box deltas, and masks.
@@ -1976,8 +1976,7 @@ class MaskRCNN():
                 input_rois = KL.Input(shape=[config.POST_NMS_ROIS_TRAINING, 4],
                                       name="input_roi", dtype=np.int32)
                 # Normalize coordinates
-                target_rois = KL.Lambda(lambda x: norm_boxes_graph(
-                    x, K.shape(input_image)[1:3]))(input_rois)
+                target_rois = KL.Lambda(lambda x: norm_boxes_graph2(x))([input_rois, input_image])
             else:
                 target_rois = rpn_rois
 
@@ -2282,7 +2281,8 @@ class MaskRCNN():
             "*epoch*", "{epoch:04d}")
 
     def train(self, train_dataset, val_dataset, learning_rate, epochs, layers,
-              augmentation=None, custom_callbacks=None, no_augmentation_sources=None):
+              augmentation=None, custom_callbacks=None,
+              no_augmentation_sources=None, random_rois=2000):
         """Train the model.
         train_dataset, val_dataset: Training and validation Dataset objects.
         learning_rate: The learning rate to train with
@@ -2332,11 +2332,13 @@ class MaskRCNN():
             layers = layer_regex[layers]
 
         # Data generators
-        train_generator = data_generator(train_dataset, self.config, shuffle=True,
+        train_generator = data_generator(train_dataset, self.config, random_rois,
+                                         shuffle=True,
                                          augmentation=augmentation,
                                          batch_size=self.config.BATCH_SIZE,
                                          no_augmentation_sources=no_augmentation_sources)
-        val_generator = data_generator(val_dataset, self.config, shuffle=True,
+        val_generator = data_generator(val_dataset, self.config, random_rois,
+                                       shuffle=True,
                                        batch_size=self.config.BATCH_SIZE)
 
         # Create log_dir if it does not exist
@@ -2868,7 +2870,7 @@ def norm_boxes_graph(boxes, shape):
     h, w = tf.split(tf.cast(shape, tf.float32), 2)
     scale = tf.concat([h, w, h, w], axis=-1) - tf.constant(1.0)
     shift = tf.constant([0., 0., 1., 1.])
-    return tf.divide(boxes - shift, scale)
+    return tf.divide(tf.cast(boxes, dtype=tf.float32) - shift, scale)
 
 
 def denorm_boxes_graph(boxes, shape):

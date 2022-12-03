@@ -74,6 +74,13 @@ class KangarooConfig(mrcnn.config.Config):
 
     STEPS_PER_EPOCH = 131
 
+    # If using RPN_ROIS then RANDOM_ROIS should be 0. Otherwise,
+    # RANDOM_ROIS should be an int > 0
+    USE_RPN_ROIS = True
+    RANDOM_ROIS = 0
+
+    assert (USE_RPN_ROIS and RANDOM_ROIS == 0) or (not USE_RPN_ROIS and RANDOM_ROIS > 0)
+
 # Train
 train_dataset = KangarooDataset()
 train_dataset.load_dataset(dataset_dir='kangaroo', is_train=True)
@@ -100,7 +107,8 @@ model.train(train_dataset=train_dataset,
             val_dataset=validation_dataset, 
             learning_rate=kangaroo_config.LEARNING_RATE, 
             epochs=1, 
-            layers='heads')
+            layers='heads',
+            random_rois=kangaroo_config.RANDOM_ROIS)
 
 model_path = 'Kangaro_mask_rcnn_trained.h5'
 model.keras_model.save_weights(model_path)
