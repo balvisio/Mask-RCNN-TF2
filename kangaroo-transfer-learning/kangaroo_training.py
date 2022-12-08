@@ -71,6 +71,8 @@ class KangarooConfig(mrcnn.config.Config):
     IMAGES_PER_GPU = 1
     
     NUM_CLASSES = 2
+    LEARNING_RATE = 0.0001
+    LEARNING_MOMENTUM = 0
 
     STEPS_PER_EPOCH = 131
 
@@ -99,7 +101,7 @@ model.load_weights(filepath='mask_rcnn_coco.h5',
 model.train(train_dataset=train_dataset, 
             val_dataset=validation_dataset, 
             learning_rate=kangaroo_config.LEARNING_RATE, 
-            epochs=1, 
+            epochs=100, 
             layers='heads')
 
 model_path = 'Kangaro_mask_rcnn_trained.h5'

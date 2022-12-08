@@ -179,7 +179,7 @@ class Config(object):
     # weights to explode. Likely due to differences in optimizer
     # implementation.
     LEARNING_RATE = 0.001
-    LEARNING_MOMENTUM = 0.9
+    LEARNING_MOMENTUM = 0.0
 
     # Weight decay regularization
     WEIGHT_DECAY = 0.0001
